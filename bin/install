@@ -1,0 +1,8 @@
+#!/bin/sh
+set -e
+
+mkdir -p "$ASDF_INSTALL_PATH/bin"
+cp "$ASDF_DOWNLOAD_PATH/exon" "$ASDF_INSTALL_PATH/bin/exon"
+chmod +x "$ASDF_INSTALL_PATH/bin/exon"
+
+echo "installed exon $ASDF_INSTALL_VERSION"
