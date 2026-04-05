@@ -7,20 +7,32 @@ VERSION="$ASDF_INSTALL_VERSION"
 OS=$(uname -s)
 ARCH=$(uname -m)
 
+case "$OS" in
+    MINGW*|MSYS*) OS="Windows" ;;
+esac
+
 case "$OS-$ARCH" in
-    Darwin-arm64)  PLATFORM="aarch64-apple-darwin" ;;
-    Linux-aarch64) PLATFORM="aarch64-linux-gnu" ;;
-    Linux-x86_64)  PLATFORM="x86_64-linux-gnu" ;;
+    Darwin-arm64)   PLATFORM="aarch64-apple-darwin" ;;
+    Linux-aarch64)  PLATFORM="aarch64-linux-gnu" ;;
+    Linux-x86_64)   PLATFORM="x86_64-linux-gnu" ;;
+    Windows-x86_64) PLATFORM="x86_64-pc-windows-msvc" ;;
     *)
         echo "error: unsupported platform $OS-$ARCH"
-        echo "supported: macOS arm64, Linux x86_64, Linux aarch64"
+        echo "supported: macOS arm64, Linux x86_64, Linux aarch64, Windows x86_64"
         exit 1
         ;;
 esac
 
-URL="https://github.com/$REPO/releases/download/v$VERSION/exon-v$VERSION-$PLATFORM.tar.gz"
-
 echo "downloading exon v$VERSION ($PLATFORM)..."
-curl -fsSL "$URL" -o "$ASDF_DOWNLOAD_PATH/exon.tar.gz"
-tar -xzf "$ASDF_DOWNLOAD_PATH/exon.tar.gz" -C "$ASDF_DOWNLOAD_PATH"
-rm "$ASDF_DOWNLOAD_PATH/exon.tar.gz"
+
+if [ "$OS" = "Windows" ]; then
+    URL="https://github.com/$REPO/releases/download/v$VERSION/exon-v$VERSION-$PLATFORM.zip"
+    curl -fsSL "$URL" -o "$ASDF_DOWNLOAD_PATH/exon.zip"
+    unzip -qo "$ASDF_DOWNLOAD_PATH/exon.zip" -d "$ASDF_DOWNLOAD_PATH"
+    rm "$ASDF_DOWNLOAD_PATH/exon.zip"
+else
+    URL="https://github.com/$REPO/releases/download/v$VERSION/exon-v$VERSION-$PLATFORM.tar.gz"
+    curl -fsSL "$URL" -o "$ASDF_DOWNLOAD_PATH/exon.tar.gz"
+    tar -xzf "$ASDF_DOWNLOAD_PATH/exon.tar.gz" -C "$ASDF_DOWNLOAD_PATH"
+    rm "$ASDF_DOWNLOAD_PATH/exon.tar.gz"
+fi
